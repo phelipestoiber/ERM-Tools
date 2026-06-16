@@ -1,0 +1,11 @@
+output/
+dist/
+build/
+__pycache__/
+*.pyc
+*.pyo
+uploads/
+*.zip
+.env
+*.egg-info/
+.venv/

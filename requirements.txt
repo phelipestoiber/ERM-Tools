@@ -1,0 +1,5 @@
+flask>=3.0
+ezdxf>=1.2
+matplotlib>=3.8
+pypdf>=4.0
+pyinstaller>=6.0
