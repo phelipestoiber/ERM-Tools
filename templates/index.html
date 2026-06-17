@@ -13,7 +13,7 @@
   <!-- ── HEADER ─────────────────────────────────────────── -->
   <header id="header">
     <span class="logo">CAD Tools</span>
-    <span class="version">v0.1.0</span>
+    <span class="version">v0.3.0</span>
     <div class="spacer"></div>
     <div class="dep-status" id="dep-status-bar" title="Status das dependências">
       <span class="dep-dot"></span>
@@ -145,11 +145,52 @@
         </div>
       </div>
 
-      <div class="placeholder">
-        <div class="icon">⊞</div>
-        <div class="title">DXF Scale — em breve</div>
-        <div class="sub">Implementado na v0.3.0</div>
+      <form id="form-dxf-scale" class="form-section">
+
+        <!-- Arquivos DXF -->
+        <div class="field">
+          <label>Arquivos DXF</label>
+          <input id="dxf-scale-files" type="file" name="files[]" multiple accept=".dxf" />
+        </div>
+
+        <!-- Fator + Sufixo -->
+        <div class="form-row">
+          <div class="field">
+            <label>Fator de escala</label>
+            <input id="scale-factor" name="factor" type="number"
+                   step="0.0001" min="0.0001" value="1.0" placeholder="ex.: 1000  ou  0.001" />
+          </div>
+          <div class="field">
+            <label>Sufixo do arquivo</label>
+            <input name="suffix" type="text" value="_scaled" placeholder="_scaled" />
+          </div>
+        </div>
+
+        <!-- Pasta de destino -->
+        <div class="field">
+          <label>Pasta de destino <span style="color:var(--text-dim)">(opcional)</span></label>
+          <div class="input-with-btn">
+            <input id="dest-folder-scale" name="dest_folder" type="text"
+                   placeholder="Padrão: output/" />
+            <button type="button" id="btn-browse-scale" class="btn btn-secondary btn-sm">Selecionar</button>
+          </div>
+        </div>
+
+        <div>
+          <button id="btn-run-scale" type="submit" class="btn btn-primary">⊞ Escalar</button>
+        </div>
+      </form>
+
+      <!-- Progresso + logs -->
+      <div class="log-section">
+        <div class="log-header">
+          <span class="log-title">Log de escalonamento</span>
+        </div>
+        <div class="progress-wrap" id="progress-scale"><div class="progress-bar"></div></div>
+        <div id="log-scale" class="log-area"></div>
       </div>
+
+      <div id="download-scale" class="download-wrap"></div>
     </section>
 
     <!-- ── PANEL: DXF/DWG → PDF ──────────────────────── -->
@@ -222,5 +263,6 @@
 
 <script src="/static/js/app.js"></script>
 <script src="/static/js/dwg_to_dxf.js"></script>
+<script src="/static/js/dxf_scale.js"></script>
 </body>
 </html>
