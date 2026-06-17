@@ -436,7 +436,8 @@ html, body {
   font-family: var(--mono);
 }
 
-#log-area {
+#log-area,
+.log-area {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -450,15 +451,19 @@ html, body {
   color: var(--text-muted);
 }
 
-#log-area .entry { display: block; }
-#log-area .entry-log  { color: var(--text-muted); }
-#log-area .entry-log::before  { content: '› '; color: var(--text-dim); }
-#log-area .entry-ok   { color: var(--ok); }
-#log-area .entry-ok::before   { content: '✓ '; }
-#log-area .entry-fail { color: var(--fail); }
-#log-area .entry-fail::before { content: '✕ '; }
-#log-area .entry-done { color: var(--accent); }
-#log-area .entry-done::before { content: '● '; }
+#log-area .entry, .log-area .entry { display: block; margin-bottom: 2px; }
+
+#log-area .entry-log,  .log-area .entry-log  { color: var(--text-muted); }
+#log-area .entry-log::before, .log-area .entry-log::before { content: '› '; color: var(--text-dim); }
+
+#log-area .entry-ok,   .log-area .entry-ok   { color: var(--ok); }
+#log-area .entry-ok::before, .log-area .entry-ok::before   { content: '✓ '; }
+
+#log-area .entry-fail, .log-area .entry-fail { color: var(--fail); }
+#log-area .entry-fail::before, .log-area .entry-fail::before { content: '✕ '; }
+
+#log-area .entry-done, .log-area .entry-done { color: var(--accent); }
+#log-area .entry-done::before, .log-area .entry-done::before { content: '● '; }
 
 /* ── PROGRESS BAR ─────────────────────────────────────────── */
 
