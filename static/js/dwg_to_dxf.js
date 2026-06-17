@@ -51,9 +51,8 @@
       return;
     }
 
+    // FormData direto do form — input já tem name="files[]"
     const fd = new FormData(form);
-    // garante que o campo chama "files[]"
-    fileIn.files && [...fileIn.files].forEach(f => fd.append('files[]', f));
 
     btnRun.disabled = true;
     btnRun.textContent = 'processando...';
