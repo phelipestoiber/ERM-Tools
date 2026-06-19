@@ -13,7 +13,7 @@
   <!-- ── HEADER ─────────────────────────────────────────── -->
   <header id="header">
     <span class="logo">CAD Tools</span>
-    <span class="version">v0.3.0</span>
+    <span class="version">v0.4.0</span>
     <div class="spacer"></div>
     <div class="dep-status" id="dep-status-bar" title="Status das dependências">
       <span class="dep-dot"></span>
@@ -198,15 +198,79 @@
       <div class="panel-header">
         <div class="panel-title"><span class="icon">⎙</span> DXF / DWG → PDF</div>
         <div class="panel-subtitle">
-          Renderiza arquivos DXF ou DWG como PDF via ezdxf + matplotlib.
+          Renderiza arquivos DXF como PDF via ezdxf + matplotlib.
+          <span style="color:var(--text-dim)">(DWG direto: v0.6.0)</span>
         </div>
       </div>
 
-      <div class="placeholder">
-        <div class="icon">⎙</div>
-        <div class="title">DXF → PDF — em breve</div>
-        <div class="sub">Implementado na v0.4.0 · DWG na v0.6.0</div>
+      <form id="form-dxf-to-pdf" class="form-section">
+
+        <!-- Arquivos -->
+        <div class="field">
+          <label>Arquivos DXF</label>
+          <input id="pdf-files" type="file" name="files[]" multiple accept=".dxf,.dwg" />
+        </div>
+
+        <!-- Papel + Orientacao -->
+        <div class="form-row">
+          <div class="field">
+            <label>Tamanho do papel</label>
+            <select name="paper">
+              <option value="A4" selected>A4</option>
+              <option value="A3">A3</option>
+              <option value="A2">A2</option>
+              <option value="A1">A1</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Orientação</label>
+            <select name="orientation">
+              <option value="landscape" selected>Paisagem</option>
+              <option value="portrait">Retrato</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Modo de cor -->
+        <div class="field">
+          <label>Cor</label>
+          <div class="radio-group">
+            <label class="check-row">
+              <input type="radio" name="color_mode" value="color" checked />
+              Cores originais
+            </label>
+            <label class="check-row">
+              <input type="radio" name="color_mode" value="bw" />
+              Preto e branco
+            </label>
+          </div>
+        </div>
+
+        <!-- Pasta de destino -->
+        <div class="field">
+          <label>Pasta de destino <span style="color:var(--text-dim)">(opcional)</span></label>
+          <div class="input-with-btn">
+            <input id="dest-folder-pdf" name="dest_folder" type="text"
+                   placeholder="Padrão: output/" />
+            <button type="button" id="btn-browse-pdf" class="btn btn-secondary btn-sm">Selecionar</button>
+          </div>
+        </div>
+
+        <div>
+          <button id="btn-run-pdf" type="submit" class="btn btn-primary">⎙ Gerar PDF</button>
+        </div>
+      </form>
+
+      <!-- Progresso + logs -->
+      <div class="log-section">
+        <div class="log-header">
+          <span class="log-title">Log de renderização</span>
+        </div>
+        <div class="progress-wrap" id="progress-pdf"><div class="progress-bar"></div></div>
+        <div id="log-pdf" class="log-area"></div>
       </div>
+
+      <div id="download-pdf" class="download-wrap"></div>
     </section>
 
     <!-- ── PANEL: PDF EDITOR ─────────────────────────── -->
@@ -264,5 +328,6 @@
 <script src="/static/js/app.js"></script>
 <script src="/static/js/dwg_to_dxf.js"></script>
 <script src="/static/js/dxf_scale.js"></script>
+<script src="/static/js/dxf_to_pdf.js"></script>
 </body>
 </html>

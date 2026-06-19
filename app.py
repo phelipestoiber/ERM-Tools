@@ -38,13 +38,14 @@ def create_app():
     from routes.system    import bp as system_bp
     from routes.dwg_to_dxf import bp as dwg_bp
     from routes.dxf_scale  import bp as scale_bp
+    from routes.dxf_to_pdf import bp as pdf_bp
 
     app.register_blueprint(system_bp)
     app.register_blueprint(dwg_bp)
     app.register_blueprint(scale_bp)
+    app.register_blueprint(pdf_bp)
 
     # Fases futuras — descomente conforme implementa:
-    # from routes.dxf_to_pdf import bp as pdf_bp   ; app.register_blueprint(pdf_bp)    # v0.4.0
     # from routes.pdf_merge  import bp as merge_bp ; app.register_blueprint(merge_bp)  # v0.5.0
 
     @app.errorhandler(500)
