@@ -61,6 +61,17 @@ def _render_single_file(
     from ezdxf.addons.drawing.config import BackgroundPolicy, ColorPolicy, Configuration
     from ezdxf.addons.drawing.matplotlib import MatplotlibBackend
 
+    # Pequena margem de segurança (% da maior dimensão) para evitar que a
+    # espessura das linhas/texto seja cortada exatamente na borda da folha.
+    # IMPORTANTE: mesmo que o usuário queira "zero margem", uma margem de
+    # segurança mínima é necessária. Quando o desenho tem geometria exatamente
+    # na borda do recorte (ex.: um retângulo de moldura) E a margem é
+    # matematicamente 0%, a linha cai exatamente sobre o limite de recorte do
+    # PDF e pode ser invisível dependendo da precisão de arredondamento do
+    # rasterizador. 0.2% é imperceptível visualmente (frações de milímetro
+    # numa folha A4) mas evita esse problema de forma confiável.
+    EXTENTS_PADDING_RATIO = 0.002
+
     result: dict = {}
 
     def _do_render():
@@ -72,6 +83,9 @@ def _render_single_file(
 
             fig = plt.figure(figsize=(width_in, height_in))
             try:
+                # Primeiro renderiza num eixo temporário cobrindo toda a
+                # figura, apenas para o Frontend desenhar e podermos medir
+                # o bounding box real do desenho (em coordenadas de dados).
                 ax = fig.add_axes((0, 0, 1, 1))
                 ax.set_axis_off()
 
@@ -88,12 +102,74 @@ def _render_single_file(
                         background_policy=BackgroundPolicy.WHITE,
                     )
 
-                backend = MatplotlibBackend(ax)
+                backend = MatplotlibBackend(ax, adjust_figure=False)
                 frontend = Frontend(ctx, backend, config=config)
                 frontend.draw_layout(msp)
 
+                # Calcula o bounding box do que foi REALMENTE desenhado e
+                # reposiciona o eixo para que ocupe a folha inteira
+                # (equivalente a "zoom extents" + "ajustar à folha" do
+                # AutoCAD), preservando a proporção do desenho — sem
+                # distorcer círculos/textos. A dimensão que melhor "encaixa"
+                # na folha vai de ponta a ponta (0% de margem); a outra
+                # fica centrada.
+                #
+                # IMPORTANTE: usamos ax.dataLim (calculado pelo matplotlib
+                # durante o desenho) em vez de ezdxf.bbox.extents(msp).
+                # O bbox do ezdxf considera TODAS as entidades do arquivo,
+                # inclusive em camadas congeladas/desligadas (ex.: camada
+                # "Defpoints" do AutoCAD, construções auxiliares ocultas —
+                # comuns em arquivos DWG convertidos). Isso deixava o
+                # cálculo da margem assimétrico: o centro do bbox ficava
+                # deslocado por geometria invisível, enquanto o desenho
+                # realmente renderizado (que respeita visibilidade de
+                # camada) não. ax.dataLim reflete fielmente só o que foi
+                # desenhado na tela, eliminando essa distorção.
+                data_bounds = ax.dataLim
+                if data_bounds.width > 0 or data_bounds.height > 0:
+                    dx = data_bounds.x1 - data_bounds.x0
+                    dy = data_bounds.y1 - data_bounds.y0
+                    cx = (data_bounds.x1 + data_bounds.x0) / 2
+                    cy = (data_bounds.y1 + data_bounds.y0) / 2
+
+                    # Evita desenhos degenerados (uma única linha/ponto)
+                    dx = dx if dx > 1e-9 else 1.0
+                    dy = dy if dy > 1e-9 else 1.0
+
+                    pad = 1.0 + EXTENTS_PADDING_RATIO
+                    dx *= pad
+                    dy *= pad
+
+                    page_aspect = width_in / height_in
+                    draw_aspect = dx / dy
+
+                    if draw_aspect > page_aspect:
+                        # Desenho proporcionalmente mais largo que a folha
+                        # → a largura ocupa 100% da página.
+                        axes_w_frac = 1.0
+                        axes_h_frac = page_aspect / draw_aspect
+                    else:
+                        # Desenho proporcionalmente mais alto que a folha
+                        # → a altura ocupa 100% da página.
+                        axes_h_frac = 1.0
+                        axes_w_frac = draw_aspect / page_aspect
+
+                    left = (1.0 - axes_w_frac) / 2
+                    bottom = (1.0 - axes_h_frac) / 2
+
+                    # O backend do ezdxf provavelmente configura
+                    # aspect='equal' no eixo durante draw_layout(). Como já
+                    # calculamos manualmente um retângulo de eixo com a
+                    # proporção exata do desenho, resetamos para 'auto'
+                    # para que nosso set_position/xlim/ylim não sejam
+                    # sobrescritos pelo mecanismo de aspecto do matplotlib.
+                    ax.set_aspect("auto")
+                    ax.set_position((left, bottom, axes_w_frac, axes_h_frac))
+                    ax.set_xlim(cx - dx / 2, cx + dx / 2)
+                    ax.set_ylim(cy - dy / 2, cy + dy / 2)
+
                 out_path = out_dir / f"{path.stem}.pdf"
-                fig.savefig(str(out_path), dpi=300, bbox_inches="tight")
+                fig.savefig(str(out_path), dpi=300)
                 result["out_path"] = out_path
             finally:
                 plt.close(fig)
