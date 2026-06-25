@@ -13,7 +13,7 @@
   <!-- ── HEADER ─────────────────────────────────────────── -->
   <header id="header">
     <span class="logo">CAD Tools</span>
-    <span class="version">v0.4.0</span>
+    <span class="version">v0.5.0</span>
     <div class="spacer"></div>
     <div class="dep-status" id="dep-status-bar" title="Status das dependências">
       <span class="dep-dot"></span>
@@ -282,11 +282,42 @@
         </div>
       </div>
 
-      <div class="placeholder">
-        <div class="icon">⊕</div>
-        <div class="title">PDF Editor — em breve</div>
-        <div class="sub">Implementado na v0.5.0</div>
-      </div>
+      <form id="form-pdf-merge" class="form-section">
+
+        <!-- Arquivos -->
+        <div class="field">
+          <label>Arquivos PDF</label>
+          <input id="pdf-merge-files" type="file" multiple accept=".pdf" />
+          <div id="pdf-stage-status" style="font-size:11px;color:var(--text-dim);margin-top:2px;"></div>
+        </div>
+
+        <!-- Lista de paginas reordenavel -->
+        <div class="field">
+          <label>Páginas (ordem final)</label>
+          <div id="pdf-page-list" class="pdf-page-list">
+            <div class="placeholder" style="padding:24px 0;">
+              <div class="sub">Nenhuma página carregada ainda</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pasta de destino -->
+        <div class="field">
+          <label>Pasta de destino <span style="color:var(--text-dim)">(opcional)</span></label>
+          <div class="input-with-btn">
+            <input id="dest-folder-merge" type="text" placeholder="Padrão: output/" />
+            <button type="button" id="btn-browse-merge" class="btn btn-secondary btn-sm">Selecionar</button>
+          </div>
+        </div>
+
+        <div>
+          <button id="btn-run-merge" type="submit" class="btn btn-primary" disabled>⊕ Mesclar PDFs</button>
+        </div>
+
+        <div id="pdf-merge-status" style="font-size:12px;font-family:var(--mono);"></div>
+      </form>
+
+      <div id="download-merge" class="download-wrap"></div>
     </section>
 
     <!-- ── PANEL: DEPENDÊNCIAS ───────────────────────── -->
@@ -329,5 +360,6 @@
 <script src="/static/js/dwg_to_dxf.js"></script>
 <script src="/static/js/dxf_scale.js"></script>
 <script src="/static/js/dxf_to_pdf.js"></script>
+<script src="/static/js/pdf_merge.js"></script>
 </body>
 </html>

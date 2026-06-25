@@ -34,19 +34,25 @@ def create_app():
     os.makedirs(output_dir, exist_ok=True)
     app.config["OUTPUT_DIR"] = output_dir
 
+    # Staging folder para uploads em duas etapas (ex.: PDF Editor) — os
+    # arquivos ficam aqui entre o upload inicial (leitura de metadados) e
+    # a operação final (merge), referenciados por um file_id.
+    staging_dir = os.path.join(app_root, "staging")
+    os.makedirs(staging_dir, exist_ok=True)
+    app.config["STAGING_DIR"] = staging_dir
+
     # ── Blueprints ──────────────────────────────────────────
     from routes.system    import bp as system_bp
     from routes.dwg_to_dxf import bp as dwg_bp
     from routes.dxf_scale  import bp as scale_bp
     from routes.dxf_to_pdf import bp as pdf_bp
+    from routes.pdf_merge  import bp as merge_bp
 
     app.register_blueprint(system_bp)
     app.register_blueprint(dwg_bp)
     app.register_blueprint(scale_bp)
     app.register_blueprint(pdf_bp)
-
-    # Fases futuras — descomente conforme implementa:
-    # from routes.pdf_merge  import bp as merge_bp ; app.register_blueprint(merge_bp)  # v0.5.0
+    app.register_blueprint(merge_bp)
 
     @app.errorhandler(500)
     def internal_error(exc):
