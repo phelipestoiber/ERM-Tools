@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CAD Tools</title>
   <link rel="stylesheet" href="/static/css/app.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.6/Sortable.min.js"></script>
 </head>
 <body>
 
@@ -291,11 +293,11 @@
           <div id="pdf-stage-status" style="font-size:11px;color:var(--text-dim);margin-top:2px;"></div>
         </div>
 
-        <!-- Lista de paginas reordenavel -->
+        <!-- Grid de paginas arrastavel (estilo ilovepdf) -->
         <div class="field">
-          <label>Páginas (ordem final)</label>
+          <label>Páginas <span style="color:var(--text-dim)">(arraste para reordenar)</span></label>
           <div id="pdf-page-list" class="pdf-page-list">
-            <div class="placeholder" style="padding:24px 0;">
+            <div class="placeholder" style="padding:24px 0;grid-column:1/-1;">
               <div class="sub">Nenhuma página carregada ainda</div>
             </div>
           </div>

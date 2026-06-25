@@ -9,3 +9,5 @@ uploads/
 .env
 *.egg-info/
 .venv/
+staging/
+.gitignore
