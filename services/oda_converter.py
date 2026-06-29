@@ -120,3 +120,49 @@ def run_oda(
         shutil.rmtree(in_dir,  ignore_errors=True)
         shutil.rmtree(out_dir, ignore_errors=True)
         yield sse_done()
+
+def convert_dwg_to_dxf_internal(dwg_files: list[Path], dest_dir: Path, oda_path: str, version: str = "ACAD2013", audit: int = 0) -> dict:
+    """Converte DWG para DXF silenciosamente. Usado internamente pelo pipeline de PDF."""
+    import subprocess
+    import shutil
+    import tempfile
+
+    in_dir = Path(tempfile.mkdtemp(prefix="cad_pipe_in_"))
+    result = {"ok": [], "fail": []}
+
+    try:
+        # Copia os arquivos para o diretório de entrada do ODA
+        for dwg in dwg_files:
+            shutil.copy2(dwg, in_dir / Path(dwg).name)
+
+        cmd = [
+            oda_path,
+            str(in_dir),
+            str(dest_dir),
+            version,
+            "DXF",
+            "0",
+            str(audit),
+        ]
+        
+        proc = subprocess.run(cmd, timeout=300, capture_output=True, text=True)
+
+        generated = list(dest_dir.glob("*.dxf"))
+        generated_stems = {f.stem.lower(): f for f in generated}
+
+        # Verifica arquivo por arquivo se o DXF correspondente foi criado
+        for dwg in dwg_files:
+            stem = Path(dwg).stem.lower()
+            if stem in generated_stems:
+                result["ok"].append(generated_stems[stem])
+            else:
+                err = (proc.stderr or "").strip() or f"Código de saída {proc.returncode}"
+                result["fail"].append((Path(dwg).name, err))
+
+    except Exception as exc:
+        for dwg in dwg_files:
+            result["fail"].append((Path(dwg).name, str(exc)))
+    finally:
+        shutil.rmtree(in_dir, ignore_errors=True)
+
+    return result

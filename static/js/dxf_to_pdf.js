@@ -1,11 +1,27 @@
 /**
- * dxf_to_pdf.js — v0.4.0
+ * dxf_to_pdf.js — v0.4.0 · pipeline DWG→PDF na v0.6.0
  * Formulário da aba "DXF / DWG → PDF" + integração SSE.
  */
 
 'use strict';
 
 (function () {
+
+  /* ── AVISO DE ODA AUSENTE ─────────────────────────────────────────── */
+
+  async function checkOdaAvailability() {
+    const warn = document.getElementById('oda-warning-pdf');
+    if (!warn) return;
+
+    try {
+      const res = await fetch('/api/detect-oda');
+      const data = await res.json();
+      warn.style.display = data.found ? 'none' : 'block';
+    } catch (e) {
+      // Em caso de erro na verificação, não bloqueia o uso da aba
+      warn.style.display = 'none';
+    }
+  }
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -46,6 +62,8 @@
 
     document.getElementById('btn-browse-pdf')
       ?.addEventListener('click', () => browseFolder('dest-folder-pdf'));
+
+    checkOdaAvailability();
   }
 
   if (document.readyState === 'loading') {

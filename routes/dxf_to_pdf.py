@@ -1,8 +1,9 @@
-"""Blueprint — POST /api/dxf-to-pdf  (v0.4.0)
+"""Blueprint — POST /api/dxf-to-pdf  (v0.4.0 · pipeline DWG→PDF na v0.6.0)
 
-Recebe arquivos .dxf (ou .dwg — pipeline encadeado, v0.6.0) via
-multipart/form-data e retorna um stream SSE com o progresso da
-renderização para PDF via ezdxf.addons.drawing + matplotlib.
+Recebe arquivos .dxf e/ou .dwg via multipart/form-data e retorna um stream
+SSE com o progresso da renderização para PDF via ezdxf.addons.drawing +
+matplotlib. Arquivos .dwg passam primeiro por um pipeline encadeado:
+ODA File Converter (DWG→DXF) seguido da mesma renderização DXF→PDF.
 """
 
 import tempfile
@@ -52,30 +53,66 @@ def dxf_to_pdf():
     output_dir = resolve_output(dest_folder)
 
     def generate():
-        from services.dxf_renderer import render_to_pdf
-        from utils.sse import sse_fail, sse_log
-
-        if saved_dwg:
-            # Pipeline DWG → PDF encadeado (ODA + renderer) — v0.6.0
-            yield sse_log(
-                f"{len(saved_dwg)} arquivo(s) .dwg detectado(s) — conversão "
-                "DWG→PDF encadeada será implementada na v0.6.0."
-            )
-            for dwg in saved_dwg:
-                yield sse_fail(dwg.name, "Conversão direta de DWG ainda não implementada (use DWG→DXF primeiro)")
-
-        if saved_dxf:
-            yield from render_to_pdf(
-                saved_dxf, paper=paper, orientation=orientation,
-                color_mode=color_mode, dest_dir=output_dir,
-            )
-        else:
-            from utils.sse import sse_done
-            yield sse_done()
-
-        # Limpeza do diretório de upload
         import shutil
-        shutil.rmtree(tmp_dir, ignore_errors=True)
+        from services.dxf_renderer import render_to_pdf
+        from utils.sse import sse_done, sse_fail, sse_log
+
+        # Arquivos .dxf que serão enviados ao renderizador — começa com os
+        # .dxf enviados diretamente; .dwg convertidos são adicionados aqui.
+        files_for_render: list[Path] = list(saved_dxf)
+        dwg_dxf_temp_dir: Path | None = None
+
+        try:
+            if saved_dwg:
+                from utils.deps import find_oda
+                oda_path = find_oda()
+
+                if not oda_path:
+                    for dwg in saved_dwg:
+                        yield sse_fail(
+                            dwg.name,
+                            "ODA File Converter não encontrado. Instale o ODA "
+                            "File Converter para converter arquivos DWG "
+                            "(https://www.opendesign.com/guestfiles/oda_file_converter).",
+                        )
+                else:
+                    from services.oda_converter import convert_dwg_to_dxf_internal
+
+                    dwg_dxf_temp_dir = Path(tempfile.mkdtemp(prefix="cad_pipeline_dxf_"))
+
+                    for dwg in saved_dwg:
+                        yield sse_log(f"Convertendo DWG para DXF: {dwg.name}")
+
+                    try:
+                        result = convert_dwg_to_dxf_internal(
+                            saved_dwg, dwg_dxf_temp_dir, oda_path,
+                            version="ACAD2013", audit=0,
+                        )
+                        for dxf_path in result["ok"]:
+                            yield sse_log(f"OK {dxf_path.name} (DWG→DXF)")
+                            files_for_render.append(dxf_path)
+                        for name, reason in result["fail"]:
+                            yield sse_fail(name, reason)
+                    except Exception as exc:
+                        for dwg in saved_dwg:
+                            yield sse_fail(dwg.name, str(exc))
+
+            if files_for_render:
+                if saved_dwg:
+                    yield sse_log("Gerando PDF a partir do(s) DXF...")
+                yield from render_to_pdf(
+                    files_for_render, paper=paper, orientation=orientation,
+                    color_mode=color_mode, dest_dir=output_dir,
+                )
+            else:
+                yield sse_done()
+
+        finally:
+            # Limpeza dos DXF intermediários gerados pelo ODA e da pasta
+            # de upload original.
+            if dwg_dxf_temp_dir:
+                shutil.rmtree(dwg_dxf_temp_dir, ignore_errors=True)
+            shutil.rmtree(tmp_dir, ignore_errors=True)
 
     return Response(
         stream_with_context(generate()),
