@@ -15,7 +15,7 @@
   <!-- ── HEADER ─────────────────────────────────────────── -->
   <header id="header">
     <span class="logo">CAD Tools</span>
-    <span class="version">v0.6.0</span>
+    <span class="version">v0.7.0</span>
     <div class="spacer"></div>
     <div class="dep-status" id="dep-status-bar" title="Status das dependências">
       <span class="dep-dot"></span>
@@ -45,6 +45,12 @@
     <button class="tab-btn" data-tab="pdf-editor">
       <span class="icon">⊕</span>
       PDF Editor
+    </button>
+
+    <button class="tab-btn" data-tab="dxf-cotagem">
+      <span class="icon">⊟</span>
+      Escalar e Cotar
+      <span class="badge">FORAN</span>
     </button>
 
     <div class="sidebar-divider"></div>
@@ -328,6 +334,121 @@
       <div id="download-merge" class="download-wrap"></div>
     </section>
 
+    <!-- ── PANEL: ESCALAR E COTAR (FORAN) ────────────────── -->
+    <section class="panel" id="panel-dxf-cotagem">
+      <div class="panel-header">
+        <div class="panel-title"><span class="icon">⊟</span> Escalar e Cotar</div>
+        <div class="panel-subtitle">
+          Cotagem automática de perfis/scallops (regra FORAN), ajuste de layout,
+          escala global e explosão de blocos. Exige um bloco mestre
+          (padrão <code>PartBlock</code>) e camadas <code>Parts</code> / <code>Labels</code>.
+        </div>
+      </div>
+
+      <form id="form-dxf-cotagem" class="form-section">
+
+        <!-- Arquivos DXF -->
+        <div class="field">
+          <label>Arquivos DXF</label>
+          <input id="cotagem-files" type="file" name="files[]" multiple accept=".dxf" />
+        </div>
+
+        <!-- Escala -->
+        <div class="field">
+          <label>Escala</label>
+          <input id="cotagem-escala" name="escala" type="number"
+                 step="0.0001" min="0.0001" value="1.0" placeholder="ex.: 46.2692" />
+        </div>
+
+        <!-- Bloco avançado, recolhível -->
+        <details class="adv-block">
+          <summary>Avançado</summary>
+
+          <div class="form-row">
+            <div class="field">
+              <label>Layer de cotas</label>
+              <input name="layer_cota" type="text" value="Dimensions" />
+            </div>
+            <div class="field">
+              <label>Layer de textos antigos</label>
+              <input name="layer_textos_antigos" type="text" value="Free Texts"
+                     placeholder="vazio = não limpar" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label>Nome do bloco mestre</label>
+              <input name="nome_bloco" type="text" value="PartBlock" />
+            </div>
+            <div class="field">
+              <label>Limite Y (vista superior)</label>
+              <input name="limite_y" type="number" step="any" value="2000" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label>Raio mínimo</label>
+              <input name="raio_minimo" type="number" step="any" value="15.0" />
+            </div>
+            <div class="field">
+              <label>Tolerância (dedup. scallop)</label>
+              <input name="tolerancia" type="number" step="any" value="2.0" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label>Tolerância de borda</label>
+              <input name="tolerancia_borda" type="number" step="any" value="5.0" />
+            </div>
+            <div class="field" style="justify-content:flex-end;padding-bottom:6px;">
+              <label for="cotagem-explodir">Opções</label>
+              <label class="check-row">
+                <input id="cotagem-explodir" name="explodir_blocos" type="checkbox" value="1" checked />
+                Explodir blocos após escalar
+              </label>
+            </div>
+          </div>
+
+          <!-- Lista dinâmica de labels fixos -->
+          <div class="field">
+            <label>Labels fixos <span style="color:var(--text-dim)">(opcional — padrão: SEÇÃO A-A / B-B)</span></label>
+            <div id="cotagem-labels-list" class="label-list"></div>
+            <div>
+              <button type="button" id="btn-add-label" class="btn btn-secondary btn-sm">+ adicionar label</button>
+            </div>
+          </div>
+        </details>
+
+        <!-- Pasta de destino -->
+        <div class="field">
+          <label>Pasta de destino <span style="color:var(--text-dim)">(opcional)</span></label>
+          <div class="input-with-btn">
+            <input id="dest-folder-cotagem" name="dest_folder" type="text"
+                   placeholder="Padrão: output/" />
+            <button type="button" id="btn-browse-cotagem" class="btn btn-secondary btn-sm">Selecionar</button>
+          </div>
+        </div>
+
+        <div>
+          <button id="btn-run-cotagem" type="submit" class="btn btn-primary">⊟ Escalar e Cotar</button>
+        </div>
+      </form>
+
+      <!-- Progresso + logs -->
+      <div class="log-section">
+        <div class="log-header">
+          <span class="log-title">Log de cotagem</span>
+        </div>
+        <div class="progress-wrap" id="progress-cotagem"><div class="progress-bar"></div></div>
+        <div id="log-cotagem" class="log-area"></div>
+      </div>
+
+      <div id="download-cotagem" class="download-wrap"></div>
+    </section>
+
     <!-- ── PANEL: DEPENDÊNCIAS ───────────────────────── -->
     <section class="panel" id="panel-deps">
       <div class="panel-header">
@@ -369,5 +490,6 @@
 <script src="/static/js/dxf_scale.js"></script>
 <script src="/static/js/dxf_to_pdf.js"></script>
 <script src="/static/js/pdf_merge.js"></script>
+<script src="/static/js/dxf_escala_cotagem.js"></script>
 </body>
 </html>

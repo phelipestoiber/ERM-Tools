@@ -706,6 +706,94 @@ html, body {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
+/* ── BLOCO AVANÇADO (Escalar e Cotar — details/summary) ──────────── */
+
+.adv-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 0;
+}
+
+.adv-block summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 9px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.adv-block summary::-webkit-details-marker { display: none; }
+
+.adv-block summary::before {
+  content: '▸';
+  font-size: 10px;
+  color: var(--text-dim);
+  transition: transform 0.12s;
+}
+
+.adv-block[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.adv-block summary:hover { color: var(--text); }
+
+.adv-block > .form-row,
+.adv-block > .field {
+  padding: 0 12px;
+  margin-bottom: 12px;
+}
+
+.adv-block > .form-row:first-of-type {
+  padding-top: 2px;
+}
+
+.adv-block > .field:last-child {
+  padding-bottom: 12px;
+}
+
+/* ── LISTA DINÂMICA DE LABELS (Escalar e Cotar) ───────────────────── */
+
+.label-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 90px auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.label-row input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 6px 8px;
+  outline: none;
+  width: 100%;
+}
+
+.label-row input:focus {
+  border-color: var(--border-focus);
+}
+
+.label-row .label-remove {
+  padding: 5px 8px;
+}
+
 /* ── MISC ─────────────────────────────────────────────────── */
 
 code {
