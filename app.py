@@ -48,6 +48,7 @@ def create_app():
     from routes.dxf_to_pdf import bp as pdf_bp
     from routes.pdf_merge  import bp as merge_bp
     from routes.dxf_escala_cotagem import bp as cotagem_bp
+    from routes.direcionamento import bp as direcionamento_bp  # v0.8.0
 
     app.register_blueprint(system_bp)
     app.register_blueprint(dwg_bp)
@@ -55,6 +56,7 @@ def create_app():
     app.register_blueprint(pdf_bp)
     app.register_blueprint(merge_bp)
     app.register_blueprint(cotagem_bp)
+    app.register_blueprint(direcionamento_bp)  # v0.8.0
 
     @app.errorhandler(500)
     def internal_error(exc):

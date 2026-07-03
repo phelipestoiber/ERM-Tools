@@ -1,4 +1,8 @@
-"""Verificador de dependências em tempo de execução."""
+"""Verificador de dependências em tempo de execução.
+
+v0.8.0: adiciona verificação de pandas, numpy, openpyxl, xlsxwriter e
+Pillow (usadas pelo módulo de Direcionamento — services/direcionamento_excel.py).
+"""
 
 import os
 
@@ -79,6 +83,11 @@ def check_all_deps() -> dict:
         "ezdxf": _check_import("ezdxf"),
         "pypdf": _check_import("pypdf"),
         "matplotlib": _check_import("matplotlib"),
+        # v0.8.0 — módulo de Direcionamento (Excel)
+        "pandas": _check_import("pandas"),
+        "openpyxl": _check_import("openpyxl"),
+        "xlsxwriter": _check_import("xlsxwriter"),
+        "pillow": _check_import("PIL"),
         "oda_found": oda is not None,
         "oda_path": oda,
         "accore_found": accore is not None,

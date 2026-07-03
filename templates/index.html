@@ -15,7 +15,7 @@
   <!-- ── HEADER ─────────────────────────────────────────── -->
   <header id="header">
     <span class="logo">CAD Tools</span>
-    <span class="version">v0.7.0</span>
+    <span class="version">v0.8.0</span>
     <div class="spacer"></div>
     <div class="dep-status" id="dep-status-bar" title="Status das dependências">
       <span class="dep-dot"></span>
@@ -51,6 +51,12 @@
       <span class="icon">⊟</span>
       Escalar e Cotar
       <span class="badge">FORAN</span>
+    </button>
+
+    <button class="tab-btn" data-tab="direcionamento">
+      <span class="icon">📊</span>
+      Direcionamento
+      <span class="badge">Excel</span>
     </button>
 
     <div class="sidebar-divider"></div>
@@ -449,6 +455,53 @@
       <div id="download-cotagem" class="download-wrap"></div>
     </section>
 
+    <!-- ── PANEL: DIRECIONAMENTO (Navipeças) ─────────────── -->
+    <section class="panel" id="panel-direcionamento">
+      <div class="panel-header">
+        <div class="panel-title"><span class="icon">📊</span> Direcionamento</div>
+        <div class="panel-subtitle">
+          Calcula o direcionamento e apontamento de peças (regra Navipeças) a
+          partir de uma planilha Excel com as colunas <code>DNA</code> e
+          <code>Ip Type</code>, exportando uma planilha formatada com tabela,
+          logo e layout de impressão.
+        </div>
+      </div>
+
+      <form id="form-direcionamento" class="form-section">
+
+        <!-- Arquivo Excel (único) -->
+        <div class="field">
+          <label>Arquivo Excel de entrada</label>
+          <input id="direcionamento-file" type="file" accept=".xlsx,.xls" />
+        </div>
+
+        <!-- Pasta de destino -->
+        <div class="field">
+          <label>Pasta de destino <span style="color:var(--text-dim)">(opcional)</span></label>
+          <div class="input-with-btn">
+            <input id="dest-folder-direcionamento" type="text"
+                   placeholder="Padrão: output/" />
+            <button type="button" id="btn-browse-direcionamento" class="btn btn-secondary btn-sm">Selecionar</button>
+          </div>
+        </div>
+
+        <div>
+          <button id="btn-run-direcionamento" type="submit" class="btn btn-primary">📊 Processar Dados</button>
+        </div>
+      </form>
+
+      <!-- Progresso + logs -->
+      <div class="log-section">
+        <div class="log-header">
+          <span class="log-title">Log de processamento</span>
+        </div>
+        <div class="progress-wrap" id="progress-direcionamento"><div class="progress-bar"></div></div>
+        <div id="log-direcionamento" class="log-area"></div>
+      </div>
+
+      <div id="download-direcionamento" class="download-wrap"></div>
+    </section>
+
     <!-- ── PANEL: DEPENDÊNCIAS ───────────────────────── -->
     <section class="panel" id="panel-deps">
       <div class="panel-header">
@@ -491,5 +544,6 @@
 <script src="/static/js/dxf_to_pdf.js"></script>
 <script src="/static/js/pdf_merge.js"></script>
 <script src="/static/js/dxf_escala_cotagem.js"></script>
+<script src="/static/js/direcionamento.js"></script>
 </body>
 </html>
