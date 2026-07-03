@@ -30,9 +30,16 @@ import math
 # =====================================================================
 
 def garantir_layer(doc, nome_layer: str, cor: int = 3) -> None:
-    """Cria a layer se ela ainda não existir no documento."""
+    """Cria a layer se não existir; força a cor independentemente.
+
+    Chamar após _limpar_entidades_layer() garante que a layer existe com a
+    cor correta mesmo numa segunda execução (quando a layer já existia mas
+    poderia ter ficado com cor padrão por alguma razão).
+    """
     if nome_layer not in doc.layers:
         doc.layers.add(nome_layer, color=cor)
+    else:
+        doc.layers.get(nome_layer).dxf.color = cor
 
 
 def excluir_layer_completa(doc, nome_layer: str) -> int:
