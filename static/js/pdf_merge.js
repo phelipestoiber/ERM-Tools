@@ -19,7 +19,7 @@ if (window.pdfjsLib) {
 
   /* ── MINIATURAS (pdf.js, renderizado localmente no navegador) ────── */
 
-  const THUMB_WIDTH = 140; // px
+  const THUMB_WIDTH = 200; // px
 
   /**
    * Renderiza cada página do arquivo local como uma imagem (data URL),
@@ -80,6 +80,7 @@ if (window.pdfjsLib) {
             page_index: p,
             n_pages_in_file: fileInfo.n_pages,
             thumbnail: thumbs[p] || null,
+            rotation: 0,
           });
         }
       });
@@ -114,26 +115,47 @@ if (window.pdfjsLib) {
       return;
     }
 
-    container.innerHTML = pageList.map((item, i) => `
-      <div class="pdf-page-card" data-index="${i}">
-        <button type="button" class="pdf-page-remove" data-action="remove" title="Remover">✕</button>
-        <div class="pdf-page-thumb">
-          ${item.thumbnail
-            ? `<img src="${item.thumbnail}" alt="página ${item.page_index + 1}" />`
-            : `<span class="pdf-page-thumb-fallback">PDF</span>`}
-          <div class="pdf-page-badge">${i + 1}</div>
+    container.innerHTML = pageList.map((item, i) => {
+      const rot = item.rotation || 0;
+      // Ao rotacionar 90°/270° a imagem "vira de lado" dentro do container
+      // portrait. scale(0.72) ≈ W/H do container reencaixa a imagem.
+      const imgTransform = rot % 180 !== 0
+        ? `rotate(${rot}deg) scale(0.72)`
+        : rot ? `rotate(${rot}deg)` : '';
+      const imgStyle = imgTransform
+        ? `style="transform:${imgTransform};transition:transform 0.25s ease;"`
+        : '';
+
+      return `
+        <div class="pdf-page-card" data-index="${i}">
+          <div class="pdf-page-thumb">
+            ${item.thumbnail
+              ? `<img src="${item.thumbnail}" alt="página ${item.page_index + 1}" ${imgStyle} />`
+              : `<span class="pdf-page-thumb-fallback">PDF</span>`}
+            <div class="pdf-page-badge">${i + 1}</div>
+            <button type="button" class="pdf-page-remove" data-action="remove" title="Remover">✕</button>
+            <button type="button" class="pdf-page-rotate" data-action="rotate" title="Rotacionar 90° ↻">↻</button>
+          </div>
+          <div class="pdf-page-caption" title="${escapeHtml(item.filename)} — pág. ${item.page_index + 1}/${item.n_pages_in_file}">
+            ${escapeHtml(item.filename)} · p.${item.page_index + 1}${rot ? ` · ${rot}°` : ''}
+          </div>
         </div>
-        <div class="pdf-page-caption" title="${escapeHtml(item.filename)} — pág. ${item.page_index + 1}/${item.n_pages_in_file}">
-          ${escapeHtml(item.filename)} · p.${item.page_index + 1}
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     container.querySelectorAll('[data-action="remove"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const card = e.target.closest('.pdf-page-card');
         removeItem(parseInt(card.dataset.index, 10));
+      });
+    });
+
+    container.querySelectorAll('[data-action="rotate"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.pdf-page-card');
+        rotateItem(parseInt(card.dataset.index, 10));
       });
     });
 
@@ -177,6 +199,11 @@ if (window.pdfjsLib) {
     renderPageList();
   }
 
+  function rotateItem(index) {
+    pageList[index].rotation = ((pageList[index].rotation || 0) + 90) % 360;
+    renderPageList();
+  }
+
   function updateMergeButton() {
     const btn = document.getElementById('btn-run-merge');
     if (btn) btn.disabled = pageList.length === 0;
@@ -204,7 +231,11 @@ if (window.pdfjsLib) {
     status.textContent = '';
     dlWrap.classList.remove('visible');
 
-    const sequence = pageList.map(({ file_id, page_index }) => ({ file_id, page_index }));
+    const sequence = pageList.map(({ file_id, page_index, rotation }) => ({
+      file_id,
+      page_index,
+      rotation: rotation || 0,
+    }));
 
     try {
       const res = await fetch('/api/pdf-merge', {

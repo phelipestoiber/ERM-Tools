@@ -147,6 +147,13 @@ def merge_pdfs(
             )
 
         writer.add_page(reader.pages[page_index])
+
+        # Aplica rotação, se informada (0, 90, 180 ou 270 graus, sentido horário)
+        rotation = item.get("rotation", 0) or 0
+        rotation = int(rotation) % 360
+        if rotation:
+            writer.pages[-1].rotate(rotation)
+
         used_file_ids.add(file_id)
 
     out_name = f"PDF_Mesclado_{uuid4().hex[:6]}.pdf"

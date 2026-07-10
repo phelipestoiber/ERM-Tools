@@ -214,7 +214,6 @@ html, body {
   flex-direction: column;
   padding: 24px;
   gap: 20px;
-  max-width: 820px;
   width: 100%;
 }
 
@@ -569,13 +568,13 @@ html, body {
 
 .pdf-page-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 14px;
-  max-height: 520px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+  max-height: 660px;
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px;
+  padding: 16px;
   background: var(--bg);
 }
 
@@ -606,6 +605,7 @@ html, body {
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   transition: border-color 0.12s, box-shadow 0.12s;
+  /* garante que os botões absolutos internos fiquem dentro do thumb */
 }
 
 .pdf-page-card:hover .pdf-page-thumb {
@@ -645,17 +645,15 @@ html, body {
   pointer-events: none;
 }
 
-.pdf-page-remove {
+.pdf-page-remove,
+.pdf-page-rotate {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 100px;
   border: none;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0,0,0,0.62);
   color: #fff;
-  font-size: 12px;
   line-height: 1;
   cursor: pointer;
   display: flex;
@@ -666,13 +664,27 @@ html, body {
   z-index: 2;
 }
 
-.pdf-page-card:hover .pdf-page-remove {
+/* ✕ no canto superior direito */
+.pdf-page-remove {
+  top: 5px;
+  right: 5px;
+  font-size: 11px;
+}
+
+/* ↻ no canto inferior direito */
+.pdf-page-rotate {
+  bottom: 5px;
+  right: 5px;
+  font-size: 15px;
+}
+
+.pdf-page-card:hover .pdf-page-remove,
+.pdf-page-card:hover .pdf-page-rotate {
   opacity: 1;
 }
 
-.pdf-page-remove:hover {
-  background: var(--fail);
-}
+.pdf-page-remove:hover { background: var(--fail); }
+.pdf-page-rotate:hover { background: var(--accent); color: #000; }
 
 .pdf-page-caption {
   width: 100%;
