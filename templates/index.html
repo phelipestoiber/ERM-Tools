@@ -15,7 +15,7 @@
   <!-- ── HEADER ─────────────────────────────────────────── -->
   <header id="header">
     <span class="logo">CAD Tools</span>
-    <span class="version"><v0 class="8.2"></v0></span>
+    <span class="version"><v0 class="9.0"></v0></span>
     <div class="spacer"></div>
     <div class="dep-status" id="dep-status-bar" title="Status das dependências">
       <span class="dep-dot"></span>
@@ -57,6 +57,12 @@
       <span class="icon">📊</span>
       Direcionamento
       <span class="badge">Excel</span>
+    </button>
+
+    <button class="tab-btn" data-tab="nesting">
+      <span class="icon">⊜</span>
+      Verificar Nestings
+      <span class="badge">DXF</span>
     </button>
 
     <div class="sidebar-divider"></div>
@@ -502,6 +508,47 @@
       <div id="download-direcionamento" class="download-wrap"></div>
     </section>
 
+    <!-- ── PANEL: VERIFICADOR DE NESTINGS ───────────────────── -->
+    <section class="panel" id="panel-nesting">
+      <div class="panel-header">
+        <div class="panel-title"><span class="icon">⊜</span> Verificador de Nestings</div>
+        <div class="panel-subtitle">
+          Compara arquivos DXF por assinatura geométrica e agrupa os nestings idênticos,
+          independentemente do nome do arquivo. Gera relatório <code>.txt</code> para download.
+        </div>
+      </div>
+
+      <form id="form-nesting" class="form-section">
+
+        <div class="field">
+          <label>Arquivos DXF</label>
+          <input id="nesting-files" type="file" multiple accept=".dxf,.DXF" />
+        </div>
+
+        <div class="field">
+          <label>Pasta de destino do relatório <span style="color:var(--text-dim)">(opcional)</span></label>
+          <div class="input-with-btn">
+            <input id="dest-folder-nesting" type="text" placeholder="Padrão: output/" />
+            <button type="button" id="btn-browse-dest-nesting" class="btn btn-secondary btn-sm">Selecionar</button>
+          </div>
+        </div>
+
+        <div>
+          <button id="btn-run-nesting" type="submit" class="btn btn-primary">⊜ Verificar Nestings</button>
+        </div>
+      </form>
+
+      <div class="log-section">
+        <div class="log-header">
+          <span class="log-title">Log de verificação</span>
+        </div>
+        <div class="progress-wrap" id="progress-nesting"><div class="progress-bar"></div></div>
+        <div id="log-nesting" class="log-area"></div>
+      </div>
+
+      <div id="download-nesting" class="download-wrap"></div>
+    </section>
+
     <!-- ── PANEL: DEPENDÊNCIAS ───────────────────────── -->
     <section class="panel" id="panel-deps">
       <div class="panel-header">
@@ -545,5 +592,6 @@
 <script src="/static/js/pdf_merge.js"></script>
 <script src="/static/js/dxf_escala_cotagem.js"></script>
 <script src="/static/js/direcionamento.js"></script>
+<script src="/static/js/nesting_checker.js"></script>
 </body>
 </html>
