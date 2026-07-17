@@ -5,6 +5,13 @@ import sys
 import signal
 import socket
 import subprocess
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="Workbook contains no default style",
+    category=UserWarning,
+    module="openpyxl",
+)
 
 
 # Porta fixa para desenvolvimento; porta livre no .exe empacotado
@@ -42,14 +49,15 @@ def create_app():
     app.config["STAGING_DIR"] = staging_dir
 
     # ── Blueprints ──────────────────────────────────────────
-    from routes.system    import bp as system_bp
-    from routes.dwg_to_dxf import bp as dwg_bp
-    from routes.dxf_scale  import bp as scale_bp
-    from routes.dxf_to_pdf import bp as pdf_bp
-    from routes.pdf_merge  import bp as merge_bp
-    from routes.dxf_escala_cotagem import bp as cotagem_bp
-    from routes.direcionamento import bp as direcionamento_bp
-    from routes.nesting_checker import bp as nesting_bp
+    from routes.system              import bp as system_bp
+    from routes.dwg_to_dxf          import bp as dwg_bp
+    from routes.dxf_scale           import bp as scale_bp
+    from routes.dxf_to_pdf          import bp as pdf_bp
+    from routes.pdf_merge           import bp as merge_bp
+    from routes.dxf_escala_cotagem  import bp as cotagem_bp
+    from routes.direcionamento      import bp as direcionamento_bp
+    from routes.nesting_checker     import bp as nesting_bp
+    from routes.comparador          import bp as comparador_bp  # v0.10.0
 
     app.register_blueprint(system_bp)
     app.register_blueprint(dwg_bp)
@@ -59,6 +67,7 @@ def create_app():
     app.register_blueprint(cotagem_bp)
     app.register_blueprint(direcionamento_bp)
     app.register_blueprint(nesting_bp)
+    app.register_blueprint(comparador_bp)  # v0.10.0
 
     @app.errorhandler(500)
     def internal_error(exc):

@@ -15,7 +15,7 @@
   <!-- ── HEADER ─────────────────────────────────────────── -->
   <header id="header">
     <span class="logo">CAD Tools</span>
-    <span class="version"><v0 class="9.0"></v0></span>
+    <span class="version">v0.10.0</span>
     <div class="spacer"></div>
     <div class="dep-status" id="dep-status-bar" title="Status das dependências">
       <span class="dep-dot"></span>
@@ -63,6 +63,12 @@
       <span class="icon">⊜</span>
       Verificar Nestings
       <span class="badge">DXF</span>
+    </button>
+
+    <button class="tab-btn" data-tab="comparador">
+      <span class="icon">⊛</span>
+      Comparador de Peças
+      <span class="badge">Excel</span>
     </button>
 
     <div class="sidebar-divider"></div>
@@ -549,6 +555,114 @@
       <div id="download-nesting" class="download-wrap"></div>
     </section>
 
+    <!-- ── PANEL: COMPARADOR DE PEÇAS ──────────────────── -->
+    <section class="panel" id="panel-comparador">
+      <div class="panel-header">
+        <div class="panel-title"><span class="icon">⊛</span> Comparador de Peças</div>
+        <div class="panel-subtitle" id="comp-subtitulo-dinamico">
+          Detecta peças de <strong>famílias diferentes</strong> com peso e área idênticos
+          dentro de uma tolerância.
+        </div>
+      </div>
+
+      <form id="form-comparador" class="form-section">
+
+        <!-- Switch de modo -->
+        <div class="field">
+          <label>Modo de comparação</label>
+          <div class="comp-modo-switch">
+            <button type="button" class="comp-modo-btn" data-modo="familias">
+              Famílias Duplicadas
+            </button>
+            <button type="button" class="comp-modo-btn" data-modo="copias">
+              Cópias Divergentes
+            </button>
+          </div>
+        </div>
+
+        <!-- Campo oculto que carrega o modo selecionado -->
+        <input type="hidden" id="comp-hidden-modo" value="familias" />
+
+        <!-- Arquivo Excel -->
+        <div class="field">
+          <label>Arquivo Excel de entrada</label>
+          <input id="comparador-file" type="file" accept=".xlsx,.xls" />
+        </div>
+
+        <!-- Tolerâncias (recolhível) -->
+        <details class="adv-block">
+          <summary>Avançado — Tolerâncias</summary>
+
+          <!-- Modo A: Famílias Duplicadas -->
+          <div class="comp-tol-bloco" data-modo="familias">
+            <div class="form-row" style="padding:0 12px;margin-top:10px;margin-bottom:8px;">
+              <div class="field">
+                <label>Tolerância de peso</label>
+                <input id="comp-tol-peso" type="number" step="0.001" min="0" value="0.009"
+                       placeholder="0.009" />
+              </div>
+              <div class="field">
+                <label>Tolerância de área</label>
+                <input id="comp-tol-area" type="number" step="0.001" min="0" value="0.009"
+                       placeholder="0.009" />
+              </div>
+            </div>
+            <div style="padding:0 12px 12px;font-size:11px;color:var(--text-dim);line-height:1.6;">
+              Peças de famílias diferentes cujo peso e área diferem menos que as tolerâncias
+              acima são agrupadas como suspeitas de duplicidade.
+            </div>
+          </div>
+
+          <!-- Modo B: Cópias Divergentes -->
+          <div class="comp-tol-bloco" data-modo="copias" style="display:none">
+            <div class="form-row" style="padding:0 12px;margin-top:10px;margin-bottom:8px;">
+              <div class="field">
+                <label>Tol. cópia verdadeira</label>
+                <input id="comp-tol-verdadeira" type="number" step="0.001" min="0" value="0.001"
+                       placeholder="0.001" />
+              </div>
+              <div class="field">
+                <label>Tol. agrupamento</label>
+                <input id="comp-tol-grupo" type="number" step="0.001" min="0" value="0.010"
+                       placeholder="0.010" />
+              </div>
+            </div>
+            <div style="padding:0 12px 12px;font-size:11px;color:var(--text-dim);line-height:1.6;">
+              <strong style="color:var(--text-muted);">Tol. cópia verdadeira:</strong>
+              diferença máxima para a cópia ser considerada igual ao original.<br>
+              <strong style="color:var(--text-muted);">Tol. agrupamento:</strong>
+              diferença máxima para duas cópias serem agrupadas entre si.
+            </div>
+          </div>
+
+        </details>
+
+        <!-- Pasta de destino -->
+        <div class="field">
+          <label>Pasta de destino <span style="color:var(--text-dim)">(opcional)</span></label>
+          <div class="input-with-btn">
+            <input id="dest-folder-comparador" type="text" placeholder="Padrão: output/" />
+            <button type="button" id="btn-browse-comparador" class="btn btn-secondary btn-sm">Selecionar</button>
+          </div>
+        </div>
+
+        <div>
+          <button id="btn-run-comparador" type="submit" class="btn btn-primary">⊛ Comparar Famílias</button>
+        </div>
+      </form>
+
+      <!-- Progresso + logs -->
+      <div class="log-section">
+        <div class="log-header">
+          <span class="log-title">Log de comparação</span>
+        </div>
+        <div class="progress-wrap" id="progress-comparador"><div class="progress-bar"></div></div>
+        <div id="log-comparador" class="log-area"></div>
+      </div>
+
+      <div id="download-comparador" class="download-wrap"></div>
+    </section>
+
     <!-- ── PANEL: DEPENDÊNCIAS ───────────────────────── -->
     <section class="panel" id="panel-deps">
       <div class="panel-header">
@@ -593,5 +707,6 @@
 <script src="/static/js/dxf_escala_cotagem.js"></script>
 <script src="/static/js/direcionamento.js"></script>
 <script src="/static/js/nesting_checker.js"></script>
+<script src="/static/js/comparador.js"></script>
 </body>
 </html>
